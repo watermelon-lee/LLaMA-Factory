@@ -1,0 +1,31 @@
+{
+  "sft_data": {
+    "file_name": "/group/40064/heyfonli/RLHF/LLaMA-Factory/data/xueling/sft_data.json",
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output",
+      "system": "system"
+    }
+  },
+  "preference_data": {
+    "file_name": "/group/40064/heyfonli/RLHF/LLaMA-Factory/data/xueling/preference_data.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected",
+      "system": "system"
+    }
+  },
+  "kto_data": {
+    "file_name": "/group/40064/heyfonli/RLHF/LLaMA-Factory/data/xueling/kto_data.json",
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output",
+      "kto_tag": "kto_tag"
+    }
+  }
+}

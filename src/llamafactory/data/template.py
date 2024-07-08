@@ -104,7 +104,9 @@ class Template:
                 if system or tools:
                     tool_text = self.format_tools.apply(content=tools)[0] if tools else ""
                     elements += self.format_system.apply(content=(system + tool_text))
-
+            # qwen
+            # 因为assistant的输出结尾处不带换行
+            # 这里为每一个user的<|im_start|>前面加上了换行
             if i > 0 and i % 2 == 0:
                 elements += self.format_separator.apply()
 
@@ -902,4 +904,12 @@ _register_template(
     name="ziya",
     format_user=StringFormatter(slots=["<human>:{{content}}\n<bot>:"]),
     format_separator=EmptyFormatter(slots=["\n"]),
+)
+
+
+_register_template(
+    name="raw",
+    format_user=StringFormatter(slots=["{{content}}"]),
+    format_assistant = StringFormatter(slots=["{{content}}"]),
+    # efficient_eos=True, 这个参数貌似会在 所有input_ids和labels后面补上 eos_token_ids
 )

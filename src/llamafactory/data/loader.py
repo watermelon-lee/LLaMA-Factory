@@ -160,6 +160,21 @@ def get_dataset(
             logger.info("Loaded tokenized dataset from {}.".format(data_args.tokenized_path))
             if data_args.streaming:
                 dataset = dataset.to_iterable_dataset()
+            try:
+                import torch
+                preprocess_func, print_function = get_preprocess_and_print_func(
+                    data_args, training_args, stage, template, tokenizer, processor
+                )
+                # 打印20条数据
+                logger.info('rank:{}'.format(torch.distributed.get_rank()))
+                if torch.distributed.get_rank() == 0:
+                    for idx, data in enumerate(iter(dataset)):
+                        if idx > 20:
+                            break
+                        logger.info('数据{}：'.format(idx))
+                        print_function(data)
+            except StopIteration:
+                raise RuntimeError("Cannot find valid samples, check `data/README.md` for the data format.")
             return dataset
 
         if data_args.streaming:
@@ -198,13 +213,21 @@ def get_dataset(
 
             sys.exit(0)
 
-        if training_args.should_log:
-            try:
-                print_function(next(iter(dataset)))
-            except StopIteration:
-                if stage == "pt":
-                    raise RuntimeError("Cannot find sufficient samples, consider increasing dataset size.")
-                else:
-                    raise RuntimeError("Cannot find valid samples, check `data/README.md` for the data format.")
+        # if training_args.should_log:
+        try:
+            # 打印20条数据
+            import torch
+            logger.info('rank:{}'.format(torch.distributed.get_rank()))
+            if torch.distributed.get_rank() == 0:
+                for idx, data in enumerate(iter(dataset)):
+                    if idx > 20:
+                        break
+                    logger.info('数据{}：'.format(idx))
+                    print_function(data)
+        except StopIteration:
+            if stage == "pt":
+                raise RuntimeError("Cannot find sufficient samples, consider increasing dataset size.")
+            else:
+                raise RuntimeError("Cannot find valid samples, check `data/README.md` for the data format.")
 
         return dataset
